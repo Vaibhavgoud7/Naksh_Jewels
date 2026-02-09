@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard' 
-import { ShopContext } from '../context/ShopContext' // CHANGED
+import { ShopContext } from '../context/ShopContext' 
 
 const Home = () => {
-  // CHANGED: Get products from context instead of dummy array
+  
   const { products } = useContext(ShopContext);
   const [topProducts, setTopProducts] = useState([]);
 
   useEffect(() => {
     if (products.length > 0) {
-        setTopProducts(products.slice(0, 5)); // Show first 5 products
+        setTopProducts(products.slice(0, 5)); 
     }
   }, [products]);
 

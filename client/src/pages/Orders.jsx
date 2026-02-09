@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import api from '../api/axios';
-import { toast } from 'react-toastify'; // Import Toast
+import { toast } from 'react-toastify'; 
 
 const Orders = () => {
     const { currency, isAuthenticated } = useContext(ShopContext);
@@ -31,10 +31,10 @@ const Orders = () => {
         }
     };
 
-    // Function to handle "Track Order" click
+    
     const handleTrackOrder = async () => {
         await loadOrderData();
-        toast.info("Order status updated!"); // Visual feedback
+        toast.info("Order status updated!"); 
     };
 
     useEffect(() => {

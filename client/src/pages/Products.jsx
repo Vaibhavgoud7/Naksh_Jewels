@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import { ShopContext } from '../context/ShopContext'; // CHANGED
+import { ShopContext } from '../context/ShopContext'; 
 import ProductCard from '../components/ProductCard';
 
 const Products = () => {
-  const { products } = useContext(ShopContext); // CHANGED
+  const { products } = useContext(ShopContext); 
 
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans pt-8">

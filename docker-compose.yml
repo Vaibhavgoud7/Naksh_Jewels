@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # 1. Backend Service
+  backend:
+    build: ./server
+    container_name: naksh_backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    depends_on:
+      - mongo_db
+
+  # 2. Frontend Service
+  frontend:
+    build: ./client
+    container_name: naksh_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:5000/api
+    depends_on:
+      - backend
+
+  # 3. Database Service (Local Fallback)
+  mongo_db:
+    image: mongo:latest
+    container_name: naksh_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

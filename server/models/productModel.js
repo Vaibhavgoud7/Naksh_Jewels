@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    description: { type: String, required: true }, // Changed to String for easy display
+    description: { type: String, required: true }, 
     price: { type: Number, required: true },
     offerPrice: { type: Number, required: true },
-    image: { type: Array, required: true }, // Keeps your multiple images
+    image: { type: Array, required: true }, 
     category: { type: String, required: true },
-    sizes: { type: Array, default: [] }, // Added for Ring/Chain sizes
-    bestseller: { type: Boolean, default: false }, // Critical for Home Page
+    sizes: { type: Array, default: [] }, 
+    bestseller: { type: Boolean, default: false }, 
     inStock: { type: Boolean, default: true }
 }, { timestamps: true });
 

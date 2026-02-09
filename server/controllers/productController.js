@@ -1,7 +1,7 @@
 import productModel from "../models/productModel.js";
 
 
-// function for list product
+
 const listProducts = async (req, res) => {
     try {
         const products = await productModel.find({});
@@ -12,7 +12,7 @@ const listProducts = async (req, res) => {
     }
 }
 
-// function for single product info
+
 const singleProduct = async (req, res) => {
     try {
         const { productId } = req.body;

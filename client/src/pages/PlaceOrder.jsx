@@ -5,7 +5,7 @@ import api from '../api/axios';
 import { ArrowRight } from 'lucide-react';
 
 const PlaceOrder = () => {
-    // 1. Get 'isAuthenticated' from Context
+    
     const { navigate, cartItems, products, getCartAmount, delivery_fee, setCartItems, isAuthenticated } = useContext(ShopContext);
 
     const [method, setMethod] = useState('cod');
@@ -14,7 +14,7 @@ const PlaceOrder = () => {
         city: '', state: '', zipcode: '', country: '', phone: ''
     });
 
-    // 2. Protect the Route: If not logged in, redirect away immediately
+    
     useEffect(() => {
         if (!isAuthenticated) {
             toast.error("Please login to place an order");
@@ -31,14 +31,14 @@ const PlaceOrder = () => {
     const onSubmitHandler = async (event) => {
         event.preventDefault();
         try {
-            // Double check just in case
+            
             if (!isAuthenticated) {
                 toast.error("Please login to place an order");
                 return navigate('/login');
             }
 
             let orderItems = [];
-            // Convert Cart Object to Array for Backend
+            
             for (const items in cartItems) {
                 for (const item in cartItems[items]) {
                     if (cartItems[items][item] > 0) {
@@ -52,7 +52,7 @@ const PlaceOrder = () => {
                 }
             }
 
-            // Prevent placing empty orders
+            
             if (orderItems.length === 0) {
                 toast.error("Your cart is empty!");
                 return;
@@ -80,7 +80,7 @@ const PlaceOrder = () => {
         }
     };
 
-    // If not authenticated, we return null to avoid flashing the form before redirect
+    
     if (!isAuthenticated) return null;
 
     return (

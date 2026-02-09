@@ -1,24 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ShopContext } from '../context/ShopContext' // CHANGED
+import { ShopContext } from '../context/ShopContext' 
 
 const ProductDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { products, addToCart } = useContext(ShopContext) // CHANGED
+  const { products, addToCart } = useContext(ShopContext) 
   
   const [product, setProduct] = useState(null)
   const [activeImg, setActiveImg] = useState('')
-  const [quantity, setQuantity] = useState(1) // Keep local UI logic
-  const [size, setSize] = useState('') // Added Size State
+  const [quantity, setQuantity] = useState(1) 
+  const [size, setSize] = useState('') 
 
   useEffect(() => {
-    // Find product in the context list by _id
+    
     const foundProduct = products.find((p) => p._id === id)
     if (foundProduct) {
       setProduct(foundProduct)
       setActiveImg(foundProduct.image[0])
-      // Default size to first option if available
+      
       if (foundProduct.sizes && foundProduct.sizes.length > 0) {
         setSize(foundProduct.sizes[0]);
       }
@@ -28,7 +28,7 @@ const ProductDetails = () => {
   if (!product) return <div className="text-center py-20">Loading...</div>
 
   const handleAddToCart = () => {
-    // Add item loop for quantity
+    
     for(let i = 0; i < quantity; i++){
        addToCart(product._id, size);
     }

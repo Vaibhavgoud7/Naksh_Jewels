@@ -7,7 +7,7 @@ const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET);
 }
 
-// Route for User Login
+
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -23,7 +23,7 @@ const loginUser = async (req, res) => {
         if (isMatch) {
             const token = createToken(user._id);
             
-            // FIXED COOKIE SETTINGS FOR LOCALHOST
+            
             res.cookie('token', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production', // true in production, false in dev
@@ -42,18 +42,18 @@ const loginUser = async (req, res) => {
     }
 }
 
-// Route for User Register
+
 const registerUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
 
-        // Check if user already exists
+        
         const exists = await userModel.findOne({ email });
         if (exists) {
             return res.json({ success: false, message: "User already exists" });
         }
 
-        // Validating email format & strong password
+        
         if (!validator.isEmail(email)) {
             return res.json({ success: false, message: "Please enter a valid email" });
         }
@@ -61,7 +61,7 @@ const registerUser = async (req, res) => {
             return res.json({ success: false, message: "Please enter a strong password" });
         }
 
-        // Hashing user password
+       
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -74,7 +74,7 @@ const registerUser = async (req, res) => {
         const user = await newUser.save();
         const token = createToken(user._id);
 
-        // FIXED COOKIE SETTINGS FOR LOCALHOST
+        
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -90,7 +90,7 @@ const registerUser = async (req, res) => {
     }
 }
 
-// Route for Admin Login
+
 const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -106,10 +106,10 @@ const adminLogin = async (req, res) => {
     }
 }
 
-// Route for User Profile
+
 const userProfile = async (req, res) => {
     try {
-        // The middleware adds 'userId' to req.body
+        
         const user = await userModel.findById(req.body.userId).select('-password'); 
         res.json({ success: true, user });
     } catch (error) {
@@ -118,7 +118,7 @@ const userProfile = async (req, res) => {
     }
 }
 
-// Route for Logout
+
 const logoutUser = async (req, res) => {
     try {
         res.clearCookie('token', {

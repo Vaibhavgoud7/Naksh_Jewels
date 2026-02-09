@@ -19,18 +19,16 @@ const Login = () => {
   }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevents page reload
+    e.preventDefault(); 
     try {
       let response;
 
       if (isLogin) {
-        // LOGIN LOGIC
         response = await api.post('/user/login', { 
           email: formData.email, 
           password: formData.password 
         });
       } else {
-        // REGISTER LOGIC
         response = await api.post('/user/register', { 
           name: formData.name, 
           email: formData.email, 
@@ -40,7 +38,7 @@ const Login = () => {
 
       if (response.data.success) {
         toast.success(response.data.message);
-        // Force the app to check the cookie immediately
+        
         await checkUser(); 
         navigate('/');
       } else {

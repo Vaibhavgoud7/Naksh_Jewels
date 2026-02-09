@@ -10,12 +10,12 @@ const authMiddleware = async (req, res, next) => {
     try {
         const token_decode = jwt.verify(token, process.env.JWT_SECRET);
         
-        // 🚨 THE FIX: Create an empty object if req.body is undefined
+        
         if (!req.body) {
             req.body = {}; 
         }
         
-        // Now this line is safe
+        
         req.body.userId = token_decode.id;
         next();
     } catch (error) {
