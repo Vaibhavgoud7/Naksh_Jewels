@@ -1,79 +1,126 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
-import { useAuth } from '../context/AuthContext' // Import Auth
+import React, { useState, useContext } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { ShopContext } from '../context/ShopContext';
+import api from '../api/axios';
+import { toast } from 'react-toastify';
+import { Menu, X, User, ShoppingBag, LogOut, Package } from 'lucide-react';
 
 const Navbar = () => {
-    const [open, setOpen] = useState(false)
-    const { cart } = useCart()
-    const { user, logout } = useAuth() // Get user status
-    const navigate = useNavigate()
+    const [visible, setVisible] = useState(false); // Mobile dropdown state
+    const [profileOpen, setProfileOpen] = useState(false); // Desktop Profile dropdown state
+    
+    const { getCartCount, navigate, isAuthenticated, setIsAuthenticated, setCartItems } = useContext(ShopContext);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/');
+    const logout = async () => {
+        try {
+            await api.post('/user/logout');
+            setIsAuthenticated(false);
+            setCartItems({});
+            toast.success("Logged out successfully");
+            navigate('/login');
+        } catch (error) {
+            console.error(error);
+            toast.error("Logout failed");
+        }
     };
 
     return (
-        <nav className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-gray-300 bg-white sticky top-0 z-50">
-
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-                 <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="40" height="40" rx="8" fill="#4F46E5"/>
-                    <path d="M11 29L11 11L18 11L24 20L24 11L29 11L29 29L22 29L16 20L16 29L11 29Z" fill="white"/>
-                </svg>
+        <nav className="relative flex items-center justify-between px-6 py-4 font-medium bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+            
+            {/* 1. LOGO */}
+            <Link to="/" className="flex items-center gap-2 group">
+                 <div className="bg-indigo-600 text-white p-1.5 rounded-lg">
+                    <span className="font-bold text-xl leading-none">NJ</span>
+                 </div>
                 <span className="text-xl font-bold text-gray-900 tracking-tight">
                     Naksh<span className="text-indigo-600">Jewels</span>
                 </span>
             </Link>
 
-            {/* Desktop Menu */}
-            <div className="hidden sm:flex items-center gap-8">
-                <Link to="/" className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition">Home</Link>
-                <Link to="/products" className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition">Collections</Link>
-                <Link to="/contact" className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition">Contact</Link>
+            {/* 2. DESKTOP NAVIGATION (Hidden on Mobile) */}
+            <ul className="hidden sm:flex gap-8 text-sm text-gray-700">
+                <NavLink to='/' className="hover:text-indigo-600 transition">HOME</NavLink>
+                <NavLink to='/products' className="hover:text-indigo-600 transition">COLLECTION</NavLink>
+                
+            </ul>
 
-                {/* Cart Icon */}
-                <Link to="/cart" className="relative cursor-pointer hover:scale-105 transition-transform">
-                    <svg width="22" height="22" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M.583.583h2.333l1.564 7.81a1.17 1.17 0 0 0 1.166.94h5.67a1.17 1.17 0 0 0 1.167-.94l.933-4.893H3.5m2.333 8.75a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0m6.417 0a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0" stroke="#4F46E5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    {cart.length > 0 && (
-                        <span className="absolute -top-2 -right-2 text-[10px] text-white bg-indigo-500 w-[16px] h-[16px] flex items-center justify-center rounded-full">
-                            {cart.length}
-                        </span>
+            {/* 3. ICONS SECTION */}
+            <div className="flex items-center gap-6">
+
+                {/* Desktop: Profile Menu (Hidden on Mobile) */}
+                <div className="hidden sm:block group relative">
+                    {isAuthenticated ? (
+                        <div 
+                            className="cursor-pointer"
+                            onMouseEnter={() => setProfileOpen(true)}
+                            onMouseLeave={() => setProfileOpen(false)}
+                        >
+                            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all">
+                                <User size={18} />
+                            </div>
+                            <div className={`absolute right-0 pt-4 ${profileOpen ? 'block' : 'hidden'}`}>
+                                <div className="flex flex-col gap-2 w-48 py-3 px-4 bg-white text-gray-600 rounded-xl shadow-xl border border-gray-100">
+                                    <p className="cursor-pointer hover:text-indigo-600 flex items-center gap-2 transition">
+                                        <User size={16} /> My Profile
+                                    </p>
+                                    <p onClick={()=>navigate('/orders')} className="cursor-pointer hover:text-indigo-600 flex items-center gap-2 transition">
+                                        <Package size={16} /> Orders
+                                    </p>
+                                    <div className="h-[1px] bg-gray-200"></div>
+                                    <p onClick={logout} className="cursor-pointer hover:text-red-500 flex items-center gap-2 transition">
+                                        <LogOut size={16} /> Logout
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <Link to='/login' className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-sm font-medium transition-all shadow-md shadow-indigo-200">
+                            Login
+                        </Link>
+                    )}
+                </div>
+
+                {/* Cart Icon (Always Visible) */}
+                <Link to='/cart' className='relative hover:scale-105 transition-transform'>
+                    <ShoppingBag className='w-5 h-5 min-w-5 text-gray-700' />
+                    {getCartCount() > 0 && (
+                        <p className='absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-indigo-600 text-white aspect-square rounded-full text-[8px]'>
+                            {getCartCount()}
+                        </p>
                     )}
                 </Link>
 
-                {/* AUTH BUTTONS */}
-                {user ? (
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm font-bold text-indigo-600">Hi, {user.name}</span>
-                        <button 
-                            onClick={handleLogout}
-                            className="text-sm font-medium text-gray-500 hover:text-red-500 transition"
-                        >
-                            Logout
-                        </button>
-                    </div>
-                ) : (
-                    <Link to="/login" className="cursor-pointer px-6 py-2 bg-indigo-600 hover:bg-indigo-700 transition text-white rounded-full text-sm font-medium">
-                        Login
-                    </Link>
-                )}
+                {/* Mobile Menu Icon (Hamburger) */}
+                <button onClick={() => setVisible(!visible)} className='sm:hidden text-gray-700 hover:text-indigo-600 focus:outline-none'>
+                    {visible ? <X size={24} /> : <Menu size={24} />}
+                </button>
             </div>
 
-            {/* Mobile Menu Button (unchanged) */}
-            <button onClick={() => setOpen(!open)} aria-label="Menu" className="sm:hidden">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#426287" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
+            {/* 4. MOBILE DROPDOWN MENU */}
+            {visible && (
+                <div className="absolute top-full left-0 right-0 bg-white border-t border-gray-100 shadow-xl flex flex-col py-4 px-6 sm:hidden animate-fade-in-down z-40">
+                    <NavLink onClick={() => setVisible(false)} className='py-3 border-b border-gray-50 text-gray-600 hover:text-indigo-600' to='/'>HOME</NavLink>
+                    <NavLink onClick={() => setVisible(false)} className='py-3 border-b border-gray-50 text-gray-600 hover:text-indigo-600' to='/products'>COLLECTION</NavLink>
+                    
+                    
+                    {isAuthenticated ? (
+                        <>
+                            <NavLink onClick={() => {setVisible(false); navigate('/orders')}} className='py-3 border-b border-gray-50 text-gray-600 hover:text-indigo-600 flex items-center gap-2' to='/orders'>
+                                <Package size={16} /> MY ORDERS
+                            </NavLink>
+                            <div onClick={() => {setVisible(false); logout()}} className='py-3 text-red-500 cursor-pointer flex items-center gap-2 hover:bg-red-50 rounded px-2 -mx-2 mt-1'>
+                                <LogOut size={16} /> LOGOUT
+                            </div>
+                        </>
+                    ) : (
+                        <NavLink onClick={() => setVisible(false)} className='py-3 text-indigo-600 font-bold mt-2' to='/login'>
+                            LOGIN
+                        </NavLink>
+                    )}
+                </div>
+            )}
         </nav>
-    )
-}
+    );
+};
 
-export default Navbar
+export default Navbar;

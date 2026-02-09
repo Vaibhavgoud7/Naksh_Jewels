@@ -1,50 +1,55 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { products } from '../data/products'
-import { useCart } from '../context/CartContext' // Import Context
+import { ShopContext } from '../context/ShopContext' // CHANGED
 
 const ProductDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { addToCart } = useCart()
+  const { products, addToCart } = useContext(ShopContext) // CHANGED
   
   const [product, setProduct] = useState(null)
   const [activeImg, setActiveImg] = useState('')
-  const [quantity, setQuantity] = useState(1) // Local quantity state
+  const [quantity, setQuantity] = useState(1) // Keep local UI logic
+  const [size, setSize] = useState('') // Added Size State
 
   useEffect(() => {
-    const foundProduct = products.find((p) => p.id === parseInt(id))
+    // Find product in the context list by _id
+    const foundProduct = products.find((p) => p._id === id)
     if (foundProduct) {
       setProduct(foundProduct)
-      setActiveImg(foundProduct.image)
+      setActiveImg(foundProduct.image[0])
+      // Default size to first option if available
+      if (foundProduct.sizes && foundProduct.sizes.length > 0) {
+        setSize(foundProduct.sizes[0]);
+      }
     }
-  }, [id])
+  }, [id, products])
 
-  if (!product) return <div className="text-center py-20">Product not found!</div>
+  if (!product) return <div className="text-center py-20">Loading...</div>
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    // Add item loop for quantity
+    for(let i = 0; i < quantity; i++){
+       addToCart(product._id, size);
+    }
   };
 
   const handleBuyNow = () => {
-    addToCart(product, quantity);
-    navigate('/cart'); // Redirect to cart immediately
+    handleAddToCart();
+    navigate('/cart'); 
   };
-
-  const images = [product.image, product.image, product.image, product.image]
 
   return (
     <div className="container mx-auto px-6 py-12 font-sans text-gray-900">
-      {/* Breadcrumb & Layout same as before... */}
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-        {/* Images Section (Same as before) */}
+        {/* Images Section */}
         <div className="flex flex-col-reverse md:flex-row gap-4 w-full h-fit">
             <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto w-full md:w-24 h-24 md:h-[500px] scrollbar-hide">
-              {images.map((img, index) => (
+              {product.image.map((img, index) => (
                 <button 
                   key={index}
-                  className={`flex-shrink-0 w-20 h-20 md:w-full md:h-24 rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${activeImg === img && index === 0 ? 'border-indigo-600' : 'border-transparent'}`}
+                  className={`flex-shrink-0 w-20 h-20 md:w-full md:h-24 rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${activeImg === img ? 'border-indigo-600' : 'border-transparent'}`}
                   onClick={() => setActiveImg(img)}
                 >
                   <img src={img} alt="" className="w-full h-full object-cover" />
@@ -59,8 +64,24 @@ const ProductDetails = () => {
         {/* Info Section */}
         <div className="flex flex-col justify-start py-2">
           <h1 className="text-3xl font-serif font-bold mb-4">{product.name}</h1>
-          <p className="text-2xl font-bold text-gray-900 mb-6">{product.price}</p>
+          <p className="text-2xl font-bold text-gray-900 mb-6">₹{product.price}</p>
           
+          {/* Size Selector (New) */}
+          <div className="mb-6">
+              <span className="font-medium text-gray-700 block mb-2">Select Size:</span>
+              <div className="flex gap-2">
+                  {product.sizes.map((s, index) => (
+                      <button 
+                        key={index}
+                        onClick={() => setSize(s)}
+                        className={`px-4 py-2 border rounded-lg ${s === size ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        {s}
+                      </button>
+                  ))}
+              </div>
+          </div>
+
           {/* Quantity Selector */}
           <div className="flex items-center gap-4 mb-8">
             <span className="font-medium text-gray-700">Quantity:</span>
@@ -93,8 +114,7 @@ const ProductDetails = () => {
           </div>
           
           <p className="text-gray-500 text-sm leading-relaxed">
-            {/* Description text... */}
-            Handcrafted with precision. Perfect for any occasion.
+            {product.description}
           </p>
         </div>
       </div>

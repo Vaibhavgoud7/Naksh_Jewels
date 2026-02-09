@@ -1,46 +1,23 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import ProductCard from '../components/ProductCard' // Import the new component
+import ProductCard from '../components/ProductCard' 
+import { ShopContext } from '../context/ShopContext' // CHANGED
 
 const Home = () => {
-  // Dummy Data for Top 5 Products
-  const topProducts = [
-    {
-      id: 1,
-      name: "Gold Plated Necklace",
-      price: "₹1,500",
-      image: "https://images.unsplash.com/photo-1599643478518-17488fbbcd75?q=80&w=500&auto=format&fit=crop"
-    },
-    {
-      id: 2,
-      name: "Diamond Stud Earrings",
-      price: "₹5,000",
-      image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=500&auto=format&fit=crop"
-    },
-    {
-      id: 3,
-      name: "Silver Charm Bracelet",
-      price: "₹850",
-      image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=500&auto=format&fit=crop"
-    },
-    {
-      id: 4,
-      name: "Wedding Ring Set",
-      price: "₹12,000",
-      image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=500&auto=format&fit=crop"
-    },
-    {
-      id: 5,
-      name: "Rose Gold Pendant",
-      price: "₹2,200",
-      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=500&auto=format&fit=crop"
+  // CHANGED: Get products from context instead of dummy array
+  const { products } = useContext(ShopContext);
+  const [topProducts, setTopProducts] = useState([]);
+
+  useEffect(() => {
+    if (products.length > 0) {
+        setTopProducts(products.slice(0, 5)); // Show first 5 products
     }
-  ];
+  }, [products]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white font-sans text-gray-900">
       
-      {/* 1. HERO SECTION */}
+      {/* 1. HERO SECTION (Unchanged) */}
       <div className="relative w-full h-[550px] flex items-center justify-center text-center text-white">
         <div className="absolute inset-0 bg-black">
             <img 
@@ -82,10 +59,10 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Using the ProductCard Component here */}
+        {/* Dynamic Products from API */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           {topProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product._id} product={product} />
           ))}
         </div>
 
@@ -97,7 +74,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 3. FOOTER SECTION */}
+      {/* 3. FOOTER SECTION (Unchanged) */}
       <footer className="w-full bg-slate-50 border-t border-gray-200 pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-6 flex flex-col items-center text-center">
             
